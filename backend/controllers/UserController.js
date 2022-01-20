@@ -121,4 +121,10 @@ module.exports = class UserController {
             console.log(e.message)
         }
     }
+
+    static async editUser(req, res) {
+        return res.status(200).json({
+            message: 'Upadate com Sucesso!'
+        })
+    }
 }
