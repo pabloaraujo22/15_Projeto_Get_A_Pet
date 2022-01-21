@@ -57,20 +57,17 @@ module.exports = class PetController {
             pet.images.push(image.filename)
         })
 
-        console.log(pet)
 
-
-        // try {
-        //     const newPet = await pet.save()
-        //     res.status(201).json({ message: 'Pet criado com sucesso', newPet })
-        // } catch (e) {
-        //     res.status(500).json({ message: `Erro ao criar o Pet!: ${e.message}` })
-        // }
+        try {
+            const newPet = await pet.save()
+            res.status(201).json({ message: 'Pet criado com sucesso', newPet })
+        } catch (e) {
+            res.status(500).json({ message: `Erro ao criar o Pet!: ${e.message}` })
+        }
     }
 
-    static async teste(req, res) {
-        const name = req.body.name
-        console.log(req.body)
-        res.status(200).json({ message: 'Deu certo' })
+    static async getAll(req, res) {
+        const pets = await Pet.find().sort('-createdAt') //sort ordena (-) ordem crescente
+        res.status(200).json({ pets })
     }
 }
