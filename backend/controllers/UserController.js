@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 //helpers
 const createUserToken = require('../helpers/create-user-token')
 const getToken = require('../helpers/get-token')
+const getUserByToken = require('../helpers/get-user-by-token')
 
 module.exports = class UserController {
 
@@ -88,7 +89,6 @@ module.exports = class UserController {
     static async checkUser(req, res) {
 
         let currentUser
-        console.log(req.headers.authorization)
 
         if (req.headers.authorization) {
 
@@ -123,8 +123,58 @@ module.exports = class UserController {
     }
 
     static async editUser(req, res) {
-        return res.status(200).json({
-            message: 'Upadate com Sucesso!'
-        })
+
+        const { name, email, phone, password, confirmpassword } = req.body
+
+        let image = ''
+
+        const token = getToken(req)
+        const user = await getUserByToken(token)
+
+        //check validations
+        if (!name) {
+            return res.status(422).json({ message: 'O nome é obrigatório!' })
+        }
+
+        user.name = name
+
+        if (!email) {
+            res.status(422).json({ message: 'O email é Obrigatório!' })
+        }
+
+        const emailExists = await User.findOne({ email })
+
+        if (user.email !== email && emailExists) {
+            return res.status(422).json({ message: 'Por favor ultilize outro email!' })
+        }
+
+        user.email = email
+
+        if (!phone) {
+            return res.status(422).json({ message: 'O telefone é obrigatório!' })
+        }
+
+        user.phone = phone
+
+        if (password !== confirmpassword) {
+            return res.status(422).json({ message: 'As senhas não Conferem!' })
+        } else if (password === confirmpassword && password != null) {
+            //creat password
+            const salt = bcrypt.genSaltSync(12)
+            const passwordHash = bcrypt.hashSync(password, salt)
+
+            user.password = passwordHash
+        }
+
+        // console.log(user)
+
+        try {
+            await User.findOneAndUpdate({ _id: user.id }, { $set: user }, { new: true })
+
+            res.status(200).json({ message: 'Usuario atualizado com sucesso!' })
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
     }
 }
