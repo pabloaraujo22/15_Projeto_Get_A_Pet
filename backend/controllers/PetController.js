@@ -4,14 +4,18 @@ const Pet = require('../models/Pet')
 //helpers
 const getToken = require('../helpers/get-token')
 const getUserByToken = require('../helpers/get-user-by-token')
+const imageUpload = require('../helpers/image-upload')
 
 module.exports = class PetController {
     //create a pet
     static async create(req, res) {
         const { name, age, weight, color } = req.body
 
-        console.log(name)
+        console.log(age)
         const available = true
+
+        //images
+        const images = req.files
 
         //check validations
         if (!name) {
@@ -25,6 +29,9 @@ module.exports = class PetController {
         }
         if (!color) {
             return res.status(422).json({ message: 'A cor é obrigatório' })
+        }
+        if (images.lenght === 0) {
+            return res.status(422).json({ message: 'A imagem é obrigatória' })
         }
 
         //user
@@ -46,11 +53,24 @@ module.exports = class PetController {
             },
         })
 
-        try {
-            const newPet = await pet.save()
-            res.status(201).json({ message: 'Pet criado com sucesso', newPet })
-        } catch (e) {
-            res.status(500).json({ message: `Erro ao criar o Pet!: ${e.message}` })
-        }
+        images.map(image => {
+            pet.images.push(image.filename)
+        })
+
+        console.log(pet)
+
+
+        // try {
+        //     const newPet = await pet.save()
+        //     res.status(201).json({ message: 'Pet criado com sucesso', newPet })
+        // } catch (e) {
+        //     res.status(500).json({ message: `Erro ao criar o Pet!: ${e.message}` })
+        // }
+    }
+
+    static async teste(req, res) {
+        const name = req.body.name
+        console.log(req.body)
+        res.status(200).json({ message: 'Deu certo' })
     }
 }

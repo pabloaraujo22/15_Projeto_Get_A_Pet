@@ -16,18 +16,18 @@ const imageStorage = multer.diskStorage({
         } else if (req.baseUrl.includes('pets')) {
             folder = 'pets'
         }
-        const base = `public/images/${folder}/${user.id}`
-        if (!fs.existsSync(base)) {
-            fs.mkdirSync(base)
-        }
+        // const base = `public/images/${folder}/${user.id}`
+        // if (!fs.existsSync(base)) {
+        //     fs.mkdirSync(base)
+        // }
 
-        cb(null, base)
-            // cb(null, `public/images/${folder}`)
+        // cb(null, base)
+        cb(null, `public/images/${folder}`)
 
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname)
-            // cb(null, Date.now() + path.extname(file.originalname))
+        // cb(null, file.originalname)
+        cb(null, Date.now() + Math.floor(Math.random() * 100) + path.extname(file.originalname))
     }
 })
 
