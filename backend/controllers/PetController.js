@@ -5,6 +5,7 @@ const Pet = require('../models/Pet')
 const getToken = require('../helpers/get-token')
 const getUserByToken = require('../helpers/get-user-by-token')
 const ObjectId = require('mongoose').Types.ObjectId
+const { use } = require('../routes/PetRoutes')
 
 module.exports = class PetController {
     //create a pet
@@ -121,5 +122,45 @@ module.exports = class PetController {
                 message: `Erro: ${e.message}`
             })
         }
+    }
+
+    static async removePetById(req, res) {
+        //id from pet
+        const id = req.params.id
+
+        //get user from token
+        const token = getToken(req)
+        const user = await getUserByToken(token)
+
+        if (!ObjectId.isValid(id)) {
+            res.status(422).json({
+                message: 'Id inválido!'
+            })
+        }
+        try {
+            const pet = await Pet.findOne({ _id: id })
+            if (!pet) {
+                res.status(404).json({
+                    message: 'Pet não encontrado!'
+                })
+            }
+
+            if (pet.user._id.toString() !== user._id.toString()) {
+                res.status(422).json({
+                    message: 'Erro ao processar sua solicitação, tente novamente mais tarde!'
+                })
+            }
+
+            await Pet.findByIdAndDelete({ _id: id })
+
+            res.status(200).json({
+                message: 'Pet deletado com sucesso'
+            })
+        } catch (e) {
+            res.status(500).json({
+                message: `Erro: ${e.message}`
+            })
+        }
+
     }
 }
