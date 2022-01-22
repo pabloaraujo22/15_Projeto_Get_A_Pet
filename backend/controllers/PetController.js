@@ -179,7 +179,7 @@ module.exports = class PetController {
         try {
             pet = await Pet.findById(id)
             if (!pet) {
-                return res.status(422).json({ message: 'Pet não existe' })
+                return res.status(404).json({ message: 'Pet não existe' })
             }
 
             //check pet user
@@ -242,5 +242,53 @@ module.exports = class PetController {
         }
 
 
+    }
+
+    static async schedule(req, res) {
+        const id = req.params.id
+        let pet;
+        //check if Pet id exists
+        if (!ObjectId.isValid(id)) {
+            return res.status(422).json({ message: 'Id inválido' })
+        }
+        //check if pet exists
+        try {
+            pet = await Pet.findById(id)
+            if (!pet) {
+                return res.status(404).json({ message: 'Pet não Existe' })
+            }
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
+        //check if user registered the Pet
+        const token = getToken(req)
+        const user = await getUserByToken(token)
+
+        if (pet.user._id.equals(user._id)) {
+            return res.status(422).json({ message: 'Você não pode agendar uma visita com o seu proprio Pet!' })
+        }
+
+        //check if user has already sheduled a visit
+        if (pet.adopter) {
+            if (pet.adopter._id.equals(user._id)) {
+                return res.status(422).json({ message: 'Você já agendou uma visita para este pet!' })
+            }
+        }
+        //add user to pet
+        pet.adopter = {
+            _id: user._id,
+            name: user.name,
+            phone: user.phone
+        }
+
+        try {
+            await Pet.findByIdAndUpdate(id, pet)
+            res.status(200).json({
+                message: `A visita foi agendada com sucesso, entre em contato com ${pet.user.name} pelo telefone ${pet.user.phone}`
+            })
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
     }
 }
