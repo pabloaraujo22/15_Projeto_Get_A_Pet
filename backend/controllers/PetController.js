@@ -6,6 +6,7 @@ const getToken = require('../helpers/get-token')
 const getUserByToken = require('../helpers/get-user-by-token')
 const ObjectId = require('mongoose').Types.ObjectId
 const { use } = require('../routes/PetRoutes')
+const { get } = require('mongoose')
 
 module.exports = class PetController {
     //create a pet
@@ -290,5 +291,40 @@ module.exports = class PetController {
         } catch (e) {
             res.status(500).json({ message: `Erro: ${e.message}` })
         }
+    }
+
+    static async concludeAdoption(req, res) {
+        const id = req.params.id
+        let pet;
+        //check if id valid
+        if (!ObjectId.isValid(id)) {
+            return res.status(422).json({ message: 'id inválido!' })
+        }
+        //check if Pet Exists
+        try {
+            await Pet.findById(id)
+            if (!pet) {
+                return res.status(404).json({ message: 'Pet não encontrado!' })
+            }
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
+        //check if logged in user registered the pet
+        const token = getToken(req)
+        const user = await getUserByToken(token)
+
+        if (!pet.user._id.equals(user._id)) {
+            return res.status(422).json({ message: 'Erro ao processar sua solicitação, tente novamente mais tarde!' })
+        }
+
+        try {
+            pet.available = false
+            await Pet.findByIdAndUpdate(id, pet)
+            res.status(200).json({ message: `Parabéns! O ciclo de adoção foi finalizado com sucesso!` })
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
     }
 }
