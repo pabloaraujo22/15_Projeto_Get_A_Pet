@@ -4,7 +4,7 @@ const Pet = require('../models/Pet')
 //helpers
 const getToken = require('../helpers/get-token')
 const getUserByToken = require('../helpers/get-user-by-token')
-const imageUpload = require('../helpers/image-upload')
+const ObjectId = require('mongoose').Types.ObjectId
 
 module.exports = class PetController {
     //create a pet
@@ -97,5 +97,29 @@ module.exports = class PetController {
             res.status(500).json({ message: `Erro: ${e.message}` })
         }
 
+    }
+
+    static async getPetById(req, res) {
+        const _id = req.params.id
+
+        if (!ObjectId.isValid(_id)) {
+            res.status(422).json({
+                message: 'Id Invalido!'
+            })
+        }
+
+        try {
+            const pet = await Pet.findById(_id)
+            if (!pet) {
+                res.status(404).json({
+                    message: `Pet não encontrado`
+                })
+            }
+            res.status(200).json({ pet })
+        } catch (e) {
+            res.status(500).json({
+                message: `Erro: ${e.message}`
+            })
+        }
     }
 }
