@@ -163,4 +163,84 @@ module.exports = class PetController {
         }
 
     }
+
+    static async updatePet(req, res) {
+        const id = req.params.id
+        const { name, age, weight, color, available } = req.body
+        const images = req.files
+
+        const updateData = {}
+        let pet;
+
+        //check if pet exists
+        if (!ObjectId.isValid(id)) {
+            return res.status(422).json({ message: 'Id inválido' })
+        }
+        try {
+            pet = await Pet.findById(id)
+            if (!pet) {
+                return res.status(422).json({ message: 'Pet não existe' })
+            }
+
+            //check pet user
+            const token = getToken(req)
+            const user = await getUserByToken(token)
+
+            if (pet.user._id.toString() !== user._id.toString()) {
+                return res.status(422).json({ message: 'Erro ao processar sua solicitação, tente novamente mais tarde!' })
+            }
+
+
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
+
+        //validations
+        if (!name) {
+            return res.status(422).json({ message: 'O nome é obrigatorio!' })
+        } else {
+            updateData.name = name
+        }
+
+        if (!age) {
+            return res.status(422).json({ message: 'A idade é obrigatorio!' })
+        } else {
+            updateData.age = age
+        }
+
+        if (!weight) {
+            return res.status(422).json({ message: 'O peso é obrigatorio!' })
+        } else {
+            updateData.weight = weight
+        }
+
+        if (!color) {
+            return res.status(422).json({ message: 'A cor é obrigatorio' })
+        } else {
+            updateData.color = color
+        }
+
+        if (!available) {
+            res.status(422).json({ message: 'O status é obrigatório' })
+        }
+
+        if (images.lenght > 0) {
+            updateData.images = []
+            images.map(image => {
+                updateData.images.push(image.filename)
+            })
+        }
+
+        try {
+            await Pet.findByIdAndUpdate(id, updateData)
+            res.status(200).json({
+                message: `Pet atualizado com sucesso!`
+            })
+        } catch (e) {
+            res.status(500).json({ message: `Erro: ${e.message}` })
+        }
+
+
+    }
 }
