@@ -1,19 +1,27 @@
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
-
-// pages
-import Home from './assets/components/pages/Auth/Home';
-import Login from './assets/components/pages/Auth/Login';
-import Register from './assets/components/pages/Auth/Register';
-
+import React from 'react';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import Container from './components/layouts/Container';
+import Footer from './components/layouts/Footer';
+import NavBar from './components/layouts/NavBar';
+import Login from './components/pages/auth/Login';
+import Register from './components/pages/auth/Register';
+import Home from './components/pages/Home';
 function App() {
     return (
+        <>
         <Router>
-            <Routes>
-                <Route path='/login' element={<Login />}/>
-                <Route path='/register' element={<Register/>}/>
-                <Route path='/' element={<Home/>}/>
-            </Routes>
-        </Router> 
+            <NavBar/>
+                <Container>
+                <Routes>
+                    <Route path='/login' element={<Login/>}/>
+                    <Route path='/register' element={<Register/>}/>
+                    <Route path='/' element={<Home/>}/>
+                </Routes>
+                </Container>
+            <Footer/>
+        </Router>
+        </>
     );
 }
+
 export default App;
