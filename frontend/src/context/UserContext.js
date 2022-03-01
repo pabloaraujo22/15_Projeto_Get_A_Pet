@@ -6,6 +6,6 @@ export const Context = createContext()
 
 export function UserProvider(props) {
     const {children} = props
-    const {register} = useAuth()
-    return <Context.Provider value={{register}}>{children}</Context.Provider>
+    const {authenticated, register} = useAuth()
+    return <Context.Provider value={{authenticated,register}}>{children}</Context.Provider>
 }

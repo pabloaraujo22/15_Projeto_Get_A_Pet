@@ -45,7 +45,7 @@ export default function Register(props) {
                 <Input
                     text="Senha"
                     type="password"
-                    name="pasword"
+                    name="password"
                     placeholder="Digite a sua Senha"
                     handleOnChange={handleChange}
                 />
