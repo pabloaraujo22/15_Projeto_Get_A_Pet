@@ -21,6 +21,9 @@ export default function NavBar(props) {
                 {authenticated ? (
                     <>
                         <li onClick={logout}>Sair</li>
+                        <li>
+                            <Link to="/user/profile"> Perfil</Link>
+                        </li>
                     </>
                 ) : (
                     <>

@@ -7,6 +7,7 @@ import NavBar from './components/layouts/NavBar';
 import Login from './components/pages/auth/Login';
 import Register from './components/pages/auth/Register';
 import Home from './components/pages/Home';
+import Profile from './components/pages/User/Profile';
 import { UserProvider } from './context/UserContext';
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                     <Routes>
                         <Route path='/login' element={<Login/>}/>
                         <Route path='/register' element={<Register/>}/>
+                        <Route path='/user/profile' element={<Profile/>}/>
                         <Route path='/' element={<Home/>}/>
                     </Routes>
                     </Container>
