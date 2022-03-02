@@ -4,9 +4,19 @@ import formStyles from '../../form/Form.module.css';
 import Input from '../../form/Input';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import api from '../../../utils/api';
 
 export default function Profile(props) {
     const [user, setUser] = useState({});
+    const [token] = useState(localStorage.getItem('token') || '');
+
+    useEffect(() => {
+        api.get('/users/checkUser', {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(token)}`,
+            },
+        }).then((response) => setUser(response.data));
+    }, [token]);
 
     function onFileChange(e) {}
 
@@ -17,8 +27,6 @@ export default function Profile(props) {
     function handleSubmit(e) {
         e.preventDefault();
     }
-
-    useEffect(() => {}, []);
 
     return (
         <section>
@@ -37,7 +45,7 @@ export default function Profile(props) {
                     text="E-mail"
                     name="email"
                     type="email"
-                    handleOnChange={onFileChange}
+                    handleOnChange={handleChange}
                     placeholder="Digite o seu email"
                     value={user.email || ''}
                 />
@@ -45,7 +53,7 @@ export default function Profile(props) {
                     text="Nome"
                     name="name"
                     type="text"
-                    handleOnChange={onFileChange}
+                    handleOnChange={handleChange}
                     placeholder="Digite o seu Nome"
                     value={user.name || ''}
                 />
@@ -53,7 +61,7 @@ export default function Profile(props) {
                     text="Telefone"
                     name="phone"
                     type="text"
-                    handleOnChange={onFileChange}
+                    handleOnChange={handleChange}
                     placeholder="Digite o seu Telefone"
                     value={user.phone || ''}
                 />
@@ -61,14 +69,14 @@ export default function Profile(props) {
                     text="Senha"
                     name="password"
                     type="password"
-                    handleOnChange={onFileChange}
+                    handleOnChange={handleChange}
                     placeholder="Digite a sua Senha"
                 />
                 <Input
                     text="Confirmação de Senha"
                     name="confirmpassword"
                     type="password"
-                    handleOnChange={onFileChange}
+                    handleOnChange={handleChange}
                     placeholder="Digite a Confirmação de Senha!"
                 />
 
