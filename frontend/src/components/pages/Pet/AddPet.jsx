@@ -5,6 +5,7 @@ import api from '../../../utils/api';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import useFlashMessage from '../../../hooks/useFlashMessage';
+import PetForm from '../../form/PetForm';
 
 export default function AddPet(props) {
     return (
@@ -13,7 +14,7 @@ export default function AddPet(props) {
                 <h1>Cadastrar um Pet</h1>
                 <p>Depois ele ficará disponível para adoção</p>
             </div>
-            <p>Formulario</p>
+            <PetForm btnText="Cadastrar Pet" />
         </section>
     );
 }
